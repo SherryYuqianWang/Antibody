@@ -1,0 +1,8 @@
+parameter,covariate,statistics,p-value,test
+k1,beta_k1_Infection_Late,1.17463,0.243503,t-Test
+k1,beta_k1_Infection_Uninfected,1.61878,0.109289,t-Test
+k2,beta_k2__1st_Booster_vaccine_type_Pfizer,18.9733,<2.2e-16,t-Test
+k3,beta_k3_Infection_Late,89.4751,<2.2e-16,t-Test
+k3,beta_k3_Infection_Uninfected,139.766,<2.2e-16,t-Test
+k3,beta_k3__1st_Booster_vaccine_type_Pfizer,107.019,<2.2e-16,t-Test
+k4,beta_k4__1st_Booster_vaccine_type_Pfizer,81.1546,<2.2e-16,t-Test

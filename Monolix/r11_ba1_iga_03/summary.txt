@@ -1,0 +1,139 @@
+********************************************************************************
+*                          r11_ba1_iga_03.mlxtran                              *
+*                          March 17, 2024 at 15:58:58                          *
+*                          Monolix version : 2023R1                            *
+********************************************************************************
+
+
+ESTIMATION OF THE POPULATION PARAMETERS ________________________________________
+
+Fixed Effects --------------------------------------     se_sa    rse(%)
+k1_pop                                   :     0.133   0.00533         4
+beta_k1_Infection_Late                   :   -0.0739    0.0436        59
+beta_k1_Infection_Uninfected             :    0.0897    0.0424      47.3
+k2_pop                                   :   0.00614  0.000693      11.3
+beta_k2__1st_Booster_vaccine_type_Pfizer :     0.196      0.14      71.2
+k3_pop                                   :     0.069  0.000918      1.33
+beta_k3_Gender_Male                      :    -0.104    0.0108      10.4
+beta_k3_Infection_Late                   :     0.711    0.0119      1.67
+beta_k3_Infection_Uninfected             :      1.89    0.0123     0.653
+beta_k3_age_cat___60                     :     0.213   0.00812      3.81
+k4_pop                                   :   0.00407  0.000616      15.1
+beta_k4_Gender_Male                      :    -0.605     0.178      29.3
+A0_pop                                   :      1.07    0.0949      8.83
+
+Standard Deviation of the Random Effects -----------
+omega_k1                                 :     0.212    0.0331      15.6
+omega_k2                                 :     0.508    0.0671      13.2
+omega_k3                                 :   0.00695       nan       nan
+omega_k4                                 :      0.19    0.0551        29
+omega_A0                                 :     0.669    0.0746      11.1
+
+Correlations ---------------------------------------
+corr_k1_A0                               :    -0.843    0.0622      7.38
+
+Error Model Parameters -----------------------------
+b                                        :       0.4    0.0237      5.92
+
+Elapsed time (seconds):       11
+Exploratory phase iterations:      165 (Autostop)
+Smoothing phase iterations:        127 (Autostop)
+
+ _______________________________________________________________________________
+
+
+
+ESTIMATION OF THE INDIVIDUAL PARAMETERS ________________________________________
+
+
+Estimation of the individual parameters by Conditional Distribution ------------
+           min        Q1    median        Q3       max
+k1 :    0.0739     0.123     0.137     0.155     0.184
+k2 :   0.00201   0.00557    0.0072   0.00949    0.0149
+k3 :    0.0621     0.077     0.157     0.411     0.565
+k4 :    0.0021   0.00227   0.00395   0.00414   0.00446
+A0 :     0.283     0.801      1.08      1.61      7.95
+
+Elapsed time (seconds):      5.8
+Iterations:       96 (Autostop)
+
+ -------------------------------------------------------------------------------
+
+
+Estimation of the individual parameters by Conditional Mode --------------------
+           min        Q1    median        Q3       max
+k1 :    0.0718     0.121     0.134     0.154     0.182
+k2 :   0.00194   0.00551   0.00734   0.00996    0.0152
+k3 :    0.0622     0.077     0.157     0.411     0.564
+k4 :   0.00213   0.00223   0.00399   0.00407   0.00438
+A0 :     0.245     0.717      1.01      1.41      7.84
+
+Elapsed time (seconds):      1.1
+
+ -------------------------------------------------------------------------------
+
+ _______________________________________________________________________________
+
+
+
+ESTIMATION OF THE FISHER INFORMATION MATRIX ____________________________________
+
+
+Estimation of the Fisher information matrix by Stochastic Approximation --------
+
+Correlation Matrix :
+                                  k1_pop         1
+                  beta_k1_Infection_Late  -0.46063         1
+            beta_k1_Infection_Uninfected  -0.52908   0.46722         1
+                                  k2_pop   0.12014 -0.0556870.00011243         1
+beta_k2__1st_Booster_vaccine_type_Pfizer -0.039063  0.037174-0.0048703  -0.70164         1
+                                  k3_pop  -0.10678  -0.10421  0.055333  0.058298  0.082669         1
+                     beta_k3_Gender_Male  0.039514   0.12294  0.015083  -0.12727 -0.036977  -0.75682         1
+                  beta_k3_Infection_Late  0.019754  0.026792 -0.035289  -0.12293 -0.082648  -0.67224   0.61327         1
+            beta_k3_Infection_Uninfected   0.10435  0.083164 0.0020699  -0.08012 -0.089081  -0.84329   0.71695   0.70826         1
+                    beta_k3_age_cat___60   0.11475  0.078785 -0.072125  0.047978 -0.023489   -0.6192   0.18802  0.070954   0.31387         1
+                                  k4_pop  0.057741 -0.010341 -0.011752  -0.22907 -0.017509  -0.20084   0.28912   0.42869    0.3713  -0.10816         1
+                     beta_k4_Gender_Male -0.015978  0.032813  0.018554  0.071876  0.079951  0.023823 -0.022927  -0.24613  -0.12587   0.13659  -0.74667         1
+                                  A0_pop  -0.64636 -0.036461  0.016652  0.019381 0.0031702  0.053557 -0.082059-0.0015236 -0.082986-0.0085206 -0.073748  0.020047         1
+                                omega_k1  -0.05161  -0.16406 -0.048161  0.083579  0.034697   0.36397  -0.44173   -0.3944   -0.3986 -0.059623   -0.2941   0.19011  0.035299         1
+                              corr_k1_A0 -0.037309  0.045056   0.12417  0.049237  -0.08466  -0.14833   0.20285   0.11786    0.1589  0.057971   0.15556  -0.14214  0.033329  -0.49451         1
+                                omega_k20.00030907  0.040944  -0.13846  -0.27239   0.02512  -0.21326   0.16363   0.28313   0.17241  0.075159   0.21804  -0.16396 -0.019579  -0.19109 -0.056652         1
+                                omega_k3       nan       nan       nan       nan       nan       nan       nan       nan       nan       nan       nan       nan       nan       nan       nan       nan       nan
+                                omega_k4  0.037678  -0.05086 0.0051776  0.088611  0.037332   0.12407  -0.29259   -0.2535  -0.17704  0.090563  -0.31477   0.17559  0.032882   0.11201 -0.075028  -0.12235       nan         1
+                                omega_A0  0.075023-0.0087497 -0.034497  0.016837 -0.011188  0.028608 -0.037294 -0.021531  0.016541 -0.028856  0.027175  0.028998  -0.12107    0.5637  -0.57251-0.0081805       nan -0.033574         1
+                                       b -0.075175 -0.044228 0.0070467  -0.14094  0.045346 -0.036897   0.14348   0.21193   0.11312  -0.10999   0.31082  -0.20311  0.020884  -0.18452  0.048071  0.039635       nan  -0.13735  -0.13003         1
+
+WARNING : Impossible to compute the eigen values of the correlation matrix.
+
+Elapsed time (seconds):       14
+Iterations:      200 (Stopped at the maximum number of iterations/Fisher matrix was not correctly estimated)
+
+ -------------------------------------------------------------------------------
+
+ _______________________________________________________________________________
+
+
+
+ESTIMATION OF THE LOG-LIKELIHOOD _______________________________________________
+
+                                                            (is)
+-2 x log-likelihood                       (OFV) :        2045.83
+Akaike Information Criteria               (AIC) :        2085.83
+Corrected Bayesian Information Criteria  (BICc) :        2143.23
+Bayesian Information Criteria             (BIC) :        2134.91
+
+Elapsed time                          (seconds) :          15.25
+CPU time                              (seconds) :          15.00
+MonteCarlo size (is):    10000 (Fixed number of iterations)
+
+
+[Importance Sampling] Standard error        : 0.240
+                      Sampling distribution : T-distribution with 5 degrees of freedom
+
+ _______________________________________________________________________________
+
+DATASET INFORMATION
+Number of individuals: 86
+Number of observations (BA1_IgA): 344
+Number of doses: 0
+

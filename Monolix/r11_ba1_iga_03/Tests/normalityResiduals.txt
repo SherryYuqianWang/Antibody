@@ -1,0 +1,4 @@
+residuals,statistics,p-value,test
+IWRES_BA1_IgA,0.993401,0.22852,Shapiro-Wilk
+PWRES_BA1_IgA,0.655516,<2.2e-16,Shapiro-Wilk
+NPDE_BA1_IgA,0.989637,0.015437,Shapiro-Wilk

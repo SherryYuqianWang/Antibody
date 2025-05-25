@@ -17,8 +17,8 @@ library(purrr) #Functional Programming
 
 
 rm(list=ls())
-setwd("C:/Users/yuqian.wang/NTU_Sherry/4antibody/6code")
-source("antibody_function.R") #function for antibody plots
+ABpath <- "~/Documents/UZH/0_random/Sherry/antibody/4. Yun Shan - Antibody Modelling/"
+source(paste0(ABpath,"Code/antibody_function.R")) #function for antibody plots
 
 # Setting ######################################################################
 Tmin <- 0
@@ -30,185 +30,85 @@ times <- c(seq(Tmin,Tmax,step_size))
 # Population fit ###############################################################
 ## Import data -----------------------------------------------------------------
 pop_fit <- list()
-pop_fit[[1]] <- read.csv("C:/Users/yuqian.wang/NTU_Sherry/4antibody/3monolix/r11_wt_igg_03/populationParameters.txt", row.names = 1)
-pop_fit[[2]] <- read.csv("C:/Users/yuqian.wang/NTU_Sherry/4antibody/3monolix/r11_ba1_igg_14/populationParameters.txt", row.names = 1)
-pop_fit[[3]] <- read.csv("C:/Users/yuqian.wang/NTU_Sherry/4antibody/3monolix/r11_wt_iga_07/populationParameters.txt", row.names = 1)
-pop_fit[[4]] <- read.csv("C:/Users/yuqian.wang/NTU_Sherry/4antibody/3monolix/r11_ba1_iga_03/populationParameters.txt", row.names = 1)
+pop_fit[[1]] <- read.csv(paste0(ABpath,"Data/Monolix/r11_wt_igg_03/populationParameters.txt"), row.names = 1)
+pop_fit[[2]] <- read.csv(paste0(ABpath,"Data/Monolix/r11_ba1_igg_14/populationParameters.txt"), row.names = 1)
+pop_fit[[3]] <- read.csv(paste0(ABpath,"Data/Monolix/r11_wt_iga_07/populationParameters.txt"), row.names = 1)
+pop_fit[[4]] <- read.csv(paste0(ABpath,"Data/Monolix/r11_ba1_iga_03/populationParameters.txt"), row.names = 1)
 
 ## Generate figure -------------------------------------------------------------
-num = 500
-ab_list <- c("IgG binding (%)","IgG binding (%)","IgA binding (%)","IgA binding (%)")
+num = 100
+ab_list <- c("WT IgG (%)","BA.1 IgG (%)","WT IgA (%)","BA.1 IgA (%)")
+plot_settings <- list(
+  list(var = "Age", colors = c("#E1BA4E", "#B279B4")),
+  list(var = "Gender", colors = c("#D98DAB", "#46C1BE")),
+  list(var = "Booster", colors = c("#D55C5C", "#368AC5"))
+)
+
+# generate different datasets base on age, gender, and booster type
 group_df <- list()
 
-# age 
-group_df[[1]] <- data.frame(group = c("Pf booster, early infected, age <60, male",
-                                      "Pf booster, late infected, age <60, male",
-                                      "Pf booster, non infected, age <60, male",
-                                      "Pf booster, early infected, age >=60, male",
-                                      "Pf booster, late infected, age >=60, male",
-                                      "Pf booster, non infected, age >=60, male"),
-                            booster = rep(1,6),
-                            infect_late = c(0, 1, 0, 0, 1, 0),
-                            infect_un = c(0, 0, 1, 0, 0, 1),
-                            infect = c(0, 1, 2, 0, 1, 2),
-                            gender = rep(0,6),
-                           age = c(0,0,0,1,1,1))
-# gender 
-group_df[[2]] <- data.frame(group = c("Pf booster, early infected, age <60, male",
-                                      "Pf booster, late infected, age <60, male",
-                                      "Pf booster, non infected, age <60, male",
-                                      "Pf booster, early infected, age <60, female",
-                                      "Pf booster, late infected, age <60, female",
-                                      "Pf booster, non infected, age <60, female"),
-                            booster = rep(1,6),
-                            infect_late = c(0, 1, 0, 0, 1, 0),
-                            infect_un = c(0, 0, 1, 0, 0, 1),
-                            infect = c(0, 1, 2, 0, 1, 2),
-                            gender = c(1, 1, 1, 0, 0, 0),
-                            age = rep(0,6))
-# booster
-group_df[[3]] <- data.frame(group = c("Pf booster, early infected, male",
-                                     "Pf booster, late infected, male",
-                                     "Pf booster, non infected, male",
-                                     "Mo booster, early infected, male",
-                                     "Mo booster, late infected, male",
-                                     "Mo booster, non infected, male"),
-                           booster = c(1, 1, 1, 0, 0, 0),
-                           infect_late = c(0, 1, 0, 0, 1, 0),
-                           infect_un = c(0, 0, 1, 0, 0, 1),
-                           infect = c(0, 1, 2, 0, 1, 2),
-                           gender = rep(0,6),
-                           age = rep(0,6))
+group_age <- create_group_df(1, 1, c(0, 1))
+group_gender <- create_group_df(1, c(1, 0), 0)
+group_booster <- create_group_df(c(1, 0), 1, 0)
+
+group_df <- list(group_age, group_gender, group_booster)
 
 
 plot_list = list()
 
-for (i in 1:4){
+for (i in seq_along(ab_list)) {
+  
   pop <- pop_fit[[i]]
   ab <- ab_list[i]
-
-    for (j in 1:3){
-    group_list <- split(group_df[[j]],seq(nrow(group_df[[j]]))) 
-    
-    total_AB <- map(group_list,simulate_AB)
-    
-    test_AB <- list_rbind(total_AB) %>% mutate(Booster =
-                                                 case_when(Booster == 0 ~ "Moderna", 
-                                                           Booster == 1 ~ "Pfizer"), 
-                                               Infect = 
-                                                 case_when(Infect == 0 ~ "Early infection",
-                                                           Infect == 1 ~ "Late infection",
-                                                           Infect == 2 ~ "Uninfected"),
-                                               Age = 
-                                                 case_when(Age == 0 ~ "<60 yr",
-                                                           Age == 1 ~ ">=60 yr"),
-                                               Gender = 
-                                                 case_when(Gender == 0 ~ "Female", 
-                                                           Gender == 1 ~ "Male"))
-    if (j==1 & ab=="IgG binding (%)"){
-      p <- ggplot() +
-      geom_line(data=test_AB,aes(x=time,y=best_ab,color = Age),lwd=1) +
-      geom_ribbon(data=test_AB,aes(x=time,ymin=q1_ab,ymax=q3_ab, fill = Age),alpha=0.15) +
-      geom_ribbon(data=test_AB,aes(x=time,ymin=low_ab,ymax=high_ab, fill = Age),alpha=0.05) +
-      xlab("Time after booster") +
-      ylab(ab_list[i])  +
-      scale_y_continuous(breaks=seq(10,70,by=10),labels = expression(10,20,30,40,50,60,70),limits=c(0,70)) +
-      scale_color_manual(values=c("#a2e7f3","#00429d"))+
-      scale_fill_manual(values=c("#a2e7f3","#00429d"))+
-      facet_grid(. ~ Infect)+
-      theme_classic()+
-      theme(axis.title.x=element_blank(),
-            legend.position="none")
-      
-    } else if (j==1 & ab!="IgG binding (%)"){
-      p <- ggplot() +
-        geom_line(data=test_AB,aes(x=time,y=best_ab,color = Age),lwd=1) +
-        geom_ribbon(data=test_AB,aes(x=time,ymin=q1_ab,ymax=q3_ab, fill = Age),alpha=0.15) +
-        geom_ribbon(data=test_AB,aes(x=time,ymin=low_ab,ymax=high_ab, fill = Age),alpha=0.05) +
-        xlab("Time after booster") +
-        ylab(ab_list[i])  +
-        scale_y_continuous(breaks=seq(10,70,by=10),labels = expression(10,20,30,40,50,60,70),limits=c(0,70)) +
-        scale_color_manual(values=c("#a2e7f3","#00429d"))+
-        scale_fill_manual(values=c("#a2e7f3","#00429d"))+
-        facet_grid(. ~ Infect)+
-        theme_classic()+
-        theme(axis.title.x=element_blank())
-      
-    } else if (j==2 & ab=="IgG binding (%)"){
-      p <- ggplot() +
-      geom_line(data=test_AB,aes(x=time,y=best_ab,color = Gender),lwd=1) +
-      geom_ribbon(data=test_AB,aes(x=time,ymin=q1_ab,ymax=q3_ab, fill = Gender),alpha=0.2) +
-      geom_ribbon(data=test_AB,aes(x=time,ymin=low_ab,ymax=high_ab, fill = Gender),alpha=0.08) +
-      xlab("Time after booster") +
-      ylab(ab_list[i])  +
-      scale_y_continuous(breaks=seq(10,70,by=10),labels = expression(10,20,30,40,50,60,70),limits=c(0,70)) +
-      scale_color_lancet()+
-      scale_fill_lancet()+
-      facet_grid(. ~ Infect)+
-      theme_classic()+
-        theme(axis.title.x=element_blank(),
-              legend.position="none")
-      
-    } else if (j==2 & ab!="IgG binding (%)"){
-      p <- ggplot() +
-        geom_line(data=test_AB,aes(x=time,y=best_ab,color = Gender),lwd=1) +
-        geom_ribbon(data=test_AB,aes(x=time,ymin=q1_ab,ymax=q3_ab, fill = Gender),alpha=0.2) +
-        geom_ribbon(data=test_AB,aes(x=time,ymin=low_ab,ymax=high_ab, fill = Gender),alpha=0.08) +
-        xlab("Time after booster") +
-        ylab(ab_list[i])  +
-        scale_y_continuous(breaks=seq(10,70,by=10),labels = expression(10,20,30,40,50,60,70),limits=c(0,70)) +
-        scale_color_lancet()+
-        scale_fill_lancet()+
-        facet_grid(. ~ Infect)+
-        theme_classic()+
-        theme(axis.title.x=element_blank())
-      
-      } else if (j==3 & (ab=="IgG binding (%)")){
-      p <- ggplot() +
-      geom_line(data=test_AB,aes(x=time,y=best_ab,color = Booster),lwd=1) +
-      geom_ribbon(data=test_AB,aes(x=time,ymin=q1_ab,ymax=q3_ab, fill = Booster),alpha=0.2) +
-      geom_ribbon(data=test_AB,aes(x=time,ymin=low_ab,ymax=high_ab, fill = Booster),alpha=0.08) +
-      xlab("Time after booster") +
-      ylab(ab_list[i])  +
-      scale_y_continuous(breaks=seq(10,70,by=10),labels = expression(10,20,30,40,50,60,70),limits=c(0,70)) +
-      facet_grid(. ~ Infect)+
-      theme_classic()+
-        theme(legend.position="none")
   
-      } else {
-        p <- ggplot() +
-          geom_line(data=test_AB,aes(x=time,y=best_ab,color = Booster),lwd=1) +
-          geom_ribbon(data=test_AB,aes(x=time,ymin=q1_ab,ymax=q3_ab, fill = Booster),alpha=0.2) +
-          geom_ribbon(data=test_AB,aes(x=time,ymin=low_ab,ymax=high_ab, fill = Booster),alpha=0.08) +
-          xlab("Time after booster") +
-          ylab(ab_list[i])  +
-          scale_y_continuous(breaks=seq(10,70,by=10),labels = expression(10,20,30,40,50,60,70),limits=c(0,70)) +
-          facet_grid(. ~ Infect)+
-          theme_classic()
-    }
-    plot_list[[(i-1)*3+j]] = p
+  for (j in seq_along(plot_settings)) {
     
+    setting <- plot_settings[[j]]
+    group_name <- setting$var
+    colors <- setting$colors
+    
+    group_list <- split(group_df[[j]], seq(nrow(group_df[[j]]))) 
+    total_AB <- map(group_list, simulate_AB)
+    plot_AB <- list_rbind(total_AB) %>%  mutate(Booster = case_when(Booster == 0 ~ "Moderna", 
+                                                                    Booster == 1 ~ "Pfizer"), 
+                                                Infect = case_when(Infect == 0 ~ "Early Infection",
+                                                                   Infect == 1 ~ "Late Infection",
+                                                                   Infect == 2 ~ "Uninfected"),
+                                                Age = case_when(Age == 0 ~ "<60 years",
+                                                                Age == 1 ~ ">=60 years"),
+                                                Gender = case_when(Gender == 0 ~ "Female", 
+                                                                   Gender == 1 ~ "Male"))
+    
+    p <- make_plot(data = plot_AB,
+                   group_var = group_name,
+                   y_label = ab,
+                   color_values = colors, 
+                   fill_values = colors)
+    
+    plot_list[[(i - 1) * 3 + j]] <- p
   }
 }
 
   
 ggdraw() +
-  draw_plot(plot_list[[3]], x = 0.02, y = 0.72, width = 0.4, height = 0.24) +
-  draw_plot(plot_list[[4]], x = 0.02, y = 0.45, width = 0.4, height = 0.22) +
-  draw_plot(plot_list[[5]], x = 0.02, y = 0.24, width = 0.4, height = 0.22) +
-  draw_plot(plot_list[[6]], x = 0.02, y = 0, width = 0.4, height = 0.24) +
-  draw_plot(plot_list[[9]], x = 0.47, y = 0.72, width = 0.53, height = 0.24) +
-  draw_plot(plot_list[[10]], x = 0.47, y = 0.45, width = 0.53, height = 0.22) +
-  draw_plot(plot_list[[11]], x = 0.47, y = 0.24, width = 0.53, height = 0.22) +
-  draw_plot(plot_list[[12]], x = 0.47, y = 0, width = 0.53, height = 0.24) +
-  draw_plot_label(label = c("WT IgG", "Omicron IgG","WT IgA", "Omicron IgA" ), size = 14,
-                  x = c(0.037,0.0,0.487,0.45), y = c(rep(c(0.995, 0.705),2)))
+  draw_plot(plot_list[[3]], x = 0.02, y = 0.71, width = 0.44, height = 0.24) +
+  draw_plot(plot_list[[6]], x = 0.02, y = 0.50, width = 0.44, height = 0.22) +
+  draw_plot(plot_list[[4]], x = 0.02, y = 0.21, width = 0.44, height = 0.24) +
+  draw_plot(plot_list[[5]], x = 0.02, y = 0, width = 0.44, height = 0.22) +
+  draw_plot(plot_list[[9]], x = 0.47, y = 0.71, width = 0.54, height = 0.24) +
+  draw_plot(plot_list[[12]], x = 0.47, y = 0.50, width = 0.54, height = 0.22) +
+  draw_plot(plot_list[[10]], x = 0.47, y = 0.21, width = 0.54, height = 0.24) +
+  draw_plot(plot_list[[11]], x = 0.47, y = 0, width = 0.54, height = 0.22) +
+  draw_plot_label(label = c("A   WT- and BA.1-specific responses:", 
+                            "B   BA.1-specific responses:                "), size = 12,
+                  x = c(-0.12,-0.12), y = c(0.995, 0.495))
 
-ggsave("plot/population2.png", width = 9.5, height = 7.5,bg = "white")
+ggsave(paste0(ABpath,"Figures/Figure3_revision1.png"), width = 10.5, height = 7.5,bg = "white")
+ggsave(paste0(ABpath,"Figures/Figure3_revision1.pdf"), width = 10.5, height = 7.5,bg = "white")
 
 # Individual fit ###############################################################
 ## Import data -----------------------------------------------------------------
-original <- read.csv("C:/Users/yuqian.wang/NTU_Sherry/4antibody/2data/P360_Sflow_For Keisuke_17Jan2024_remove74.csv")
+original <- read.csv(paste0(ABpath,"Data/P360_Sflow_For Keisuke_17Jan2024_remove74.csv"))
 original$booster_trans <- strptime(as.character(original$Booster.Vaccination.date), "%d/%m/%Y")
 original_cov <- list()
 original_cov[[1]] <- original %>% select(Code, booster_trans, DoI, WT.IgG) %>% group_by(Code) %>% slice(2)
@@ -218,21 +118,21 @@ original_cov[[4]] <- original %>% select(Code, booster_trans, DoI, BA1.IgA) %>% 
 
 sg_covid <- list()
 for (i in 1:4){
-  sg_covid[[i]] <- read.csv("C:/Users/yuqian.wang/NTU_Sherry/4antibody/2data/weekly_cases_per_million.csv")
+  sg_covid[[i]] <- read.csv(paste0(ABpath,"weekly_cases_per_million.csv"))
   sg_covid[[i]]$date_trans <- strptime(as.character(sg_covid[[i]]$date), "%Y-%m-%d")
 }
 
 Estimated <- list()
-Estimated[[1]] <- read.csv("C:/Users/yuqian.wang/NTU_Sherry/4antibody/3monolix/r11_wt_igg_03/IndividualParameters/estimatedIndividualParameters.txt", sep = ",", comment.char = "", header = T)
-Estimated[[2]] <- read.csv("C:/Users/yuqian.wang/NTU_Sherry/4antibody/3monolix/r11_ba1_igg_14/IndividualParameters/estimatedIndividualParameters.txt", sep = ",", comment.char = "", header = T)
-Estimated[[3]] <- read.csv("C:/Users/yuqian.wang/NTU_Sherry/4antibody/3monolix/r11_wt_iga_07/IndividualParameters/estimatedIndividualParameters.txt", sep = ",", comment.char = "", header = T)
-Estimated[[4]] <- read.csv("C:/Users/yuqian.wang/NTU_Sherry/4antibody/3monolix/r11_ba1_iga_03/IndividualParameters/estimatedIndividualParameters.txt", sep = ",", comment.char = "", header = T)
+Estimated[[1]] <- read.csv(paste0(ABpath,"Data/Monolix/r11_wt_igg_03/IndividualParameters/estimatedIndividualParameters.txt"), sep = ",", comment.char = "", header = T)
+Estimated[[2]] <- read.csv(paste0(ABpath,"Data/Monolix/r11_ba1_igg_14/IndividualParameters/estimatedIndividualParameters.txt"), sep = ",", comment.char = "", header = T)
+Estimated[[3]] <- read.csv(paste0(ABpath,"Data/Monolix/r11_wt_iga_07/IndividualParameters/estimatedIndividualParameters.txt"), sep = ",", comment.char = "", header = T)
+Estimated[[4]] <- read.csv(paste0(ABpath,"Data/Monolix/r11_ba1_iga_03/IndividualParameters/estimatedIndividualParameters.txt"), sep = ",", comment.char = "", header = T)
 
 Simulated <- list()
-Simulated[[1]] <- read.csv("C:/Users/yuqian.wang/NTU_Sherry/4antibody/3monolix/r11_wt_igg_03/IndividualParameters/simulatedIndividualParameters.txt", sep = ",", comment.char = "", header = T)
-Simulated[[2]] <- read.csv("C:/Users/yuqian.wang/NTU_Sherry/4antibody/3monolix/r11_ba1_igg_14/IndividualParameters/simulatedIndividualParameters.txt", sep = ",", comment.char = "", header = T)
-Simulated[[3]] <- read.csv("C:/Users/yuqian.wang/NTU_Sherry/4antibody/3monolix/r11_wt_iga_07/IndividualParameters/simulatedIndividualParameters.txt", sep = ",", comment.char = "", header = T)
-Simulated[[4]] <- read.csv("C:/Users/yuqian.wang/NTU_Sherry/4antibody/3monolix/r11_ba1_iga_03/IndividualParameters/simulatedIndividualParameters.txt", sep = ",", comment.char = "", header = T)
+Simulated[[1]] <- read.csv(paste0(ABpath,"Data/Monolix/r11_wt_igg_03/IndividualParameters/simulatedIndividualParameters.txt"), sep = ",", comment.char = "", header = T)
+Simulated[[2]] <- read.csv(paste0(ABpath,"Data/Monolix/r11_ba1_igg_14/IndividualParameters/simulatedIndividualParameters.txt"), sep = ",", comment.char = "", header = T)
+Simulated[[3]] <- read.csv(paste0(ABpath,"Data/Monolix/r11_wt_iga_07/IndividualParameters/simulatedIndividualParameters.txt"), sep = ",", comment.char = "", header = T)
+Simulated[[4]] <- read.csv(paste0(ABpath,"Data/Monolix/r11_ba1_iga_03/IndividualParameters/simulatedIndividualParameters.txt"), sep = ",", comment.char = "", header = T)
 
 ## Tables ----------------------------------------------------------------------
 
@@ -246,7 +146,7 @@ ind_AB <- map2(Estimated,original_cov,ind_ab_long_cluster)
 
 
 sheets <- list("wt_igg" = ind_AB[[1]], "ba1_igg" = ind_AB[[2]], "wt_iga" = ind_AB[[3]], "ba1_iga" = ind_AB[[4]])
-write_xlsx(sheets, "./output/antibody_individual_protection_80%.xlsx")
+write_xlsx(sheets, paste0(ABpath,"Output/antibody_individual_protection_80%.xlsx"))
 
 ## Figures ---------------------------------------------------------------------
 #Generate figures
@@ -292,12 +192,12 @@ combine_reg <- map_df(reg_ab, ~as.data.frame(.x), .id = "Antibody") %>%
                               Antibody == "3" ~ "WT IgA",
                               Antibody == "4" ~ "BA1 IgA")) %>% select(!(fit_id))
 
-write_xlsx(combine_reg, "./output/regression_result.xlsx")
+write_xlsx(combine_reg, paste0(ABpath,"Output/regression_result.xlsx"))
 
 
 # Survival analysis ############################################################
 ## Data prep -------------------------------------------------------------------
-ba1_iga_cat <- read.csv("C:/Users/yuqian.wang/NTU_Sherry/4antibody/2data/ba1_iga_new.csv")
+ba1_iga_cat <- read.csv(paste0(ABpath,"ba1_iga_new.csv"))
 
 # prep data frames for survival models
 ba1_iga_cat$doi_new[is.na(ba1_iga_cat$doi_new)] <- 339
@@ -332,95 +232,200 @@ summary(ba1_iga_cont) # higher ba1 IgA => lower risk of infection
 
 
 ## Prediction ------------------------------------------------------------------
-rep_n <- length(seq(0,49,5))
-
 #age_cat <- c(">=60","<60")
 #booster <- c("1","0")
 #gender <- c("Male","Female")
-cases <- c(600,5000,12000) #low:600 cases(~10/100,000 people/day) #intermediate:5000 cases(~80/100,000 people/day) #high:12000 cases(~200/100,000 people/day)
+cases <- c(2653,4347,8099) #weekly cases per million
+tstop_values <- seq(10,360,10)
+k2_ref <- (exp(log(0.00614)+0.2) + 0.00614)/2
+A0_values <- c(1,10,20,30,40,50)
+
+Tmin <- 28
+step_size <- 1
+tstop_ind <- 388
+rep_n = (tstop_ind-Tmin)+1
 
 
+pars_list <- lapply(A0_values, function(a0) {
+  c(A0 = a0, k2 = k2_ref)  # make it a named numeric vector
+})
+
+
+
+results <- map(pars_list, ~ ode_ab_surv(pars = ., tstop_ind = tstop_ind))
+names(results) <- A0_values
+
+results_df <- bind_rows(results, .id = "AO")
 
 pred_df<-data.frame()
 
-#for (a in 1:2){
-#for (t in 1:2){
-for (c in 1:3){
-  # for (g in 1:2){
-  test.dat <- data.frame(antibody = rep(seq(0,49,5),1),
-                         tstart=rep(1,rep_n),
-                         tstop=rep(91,rep_n),
+
+for (a in seq_along(A0_values)){
+  for (c in 1:3){
+  test.dat <- data.frame(antibody = results[[a]][, 2],
+                         tstart=c(Tmin:tstop_ind),
+                         tstop=c((Tmin+1):(tstop_ind+1)),
                          event=rep(0,rep_n),
+                         cases=rep(cases[c],rep_n),
+                         A0 = A0_values[a])
                          # age_cat=rep(age_cat[a],rep_n),
                          # Booster=rep(booster[b],rep_n),
-                         cases=rep(cases[c],rep_n))
   # Gender=rep(gender[g],rep_n))
   pred_df <- rbind(pred_df,test.dat)
   #}
   #}
-  #}
+  }
 }
-
 
 preds <- predict(ba1_iga_cont, newdata = pred_df, type = "survival",se.fit = TRUE)
 
 pred_df$prob <-preds$fit
-pred_df$upr <- preds$fit + (1.96 * preds$se.fit)
-pred_df$lwr <- preds$fit - (1.96 * preds$se.fit)
+#pred_df$upr <- preds$fit + (1.96 * preds$se.fit)
+#pred_df$lwr <- preds$fit - (1.96 * preds$se.fit)
 #pred_df$cases <- as.factor(pred_df$cases)
 
-pred_df <- pred_df %>% 
+
+
+# Create all combinations
+combinations <- expand.grid(A0 = A0_values,
+                            cases = cases,
+                            tstop = tstop_values)
+
+# Calculate cumulative probability for each combination
+pred_df_plt <- combinations %>%
+  pmap_dfr(function(A0_val, cases_val, tstop_val) {
+     filtered <- pred_df %>%
+       filter(A0 == A0_val, cases == cases_val, tstop <= tstop_val)
+     
+     prob_cum <- prod(filtered$prob)
+    
+    tibble(A0 = A0_val, cases = cases_val, tstop = tstop_val, prob_cum = prob_cum)
+  })
+
+
+pred_df_plt <- pred_df_plt %>% 
   mutate(#Booster = case_when(Booster == "0" ~ "Moderna",
     #                    Booster == "1" ~ "Pfizer"),
     #age_cat = case_when(age_cat == "<60" ~ "<60 yr",
     #                   age_cat == ">=60" ~ ">=60 yr"),
-    cases = case_when(cases == 600 ~ "Low transmission",
-                      cases == 5000 ~ "Intermediate transmission",
-                      cases == 12000 ~ "High transmission"),
-    upr = ifelse(upr<=1,upr,1),
-    lwr = ifelse(lwr<=0,0,lwr))
-
-pred_df$cases <- factor(pred_df$cases, levels = c("Low transmission", "Intermediate transmission", "High transmission"))
+    cases = case_when(cases == 2653 ~ "Low transmission",
+                      cases == 4347 ~ "Intermediate transmission",
+                      cases == 8099 ~ "High transmission"),
+    cases = factor(cases, levels = c("Low transmission", "Intermediate transmission", "High transmission")),
+    tstop_fac = as.factor(tstop),
+    A0_fac =as.factor(A0))
+    #upr = ifelse(upr<=1,upr,1),
+    #lwr = ifelse(lwr<=0,0,lwr))
 
 
 ## Figure ----------------------------------------------------------------------
 #ba1_IgA_3 months
-mod_80 <- 10
-high_80 <- 23.6
+low_3m_80 <- 11
+mod_6m_80 <- 9
+high_3m_80 <- 22
 
 #ba1_IgA_6 months
-mod_80 <- 20
-high_80 <- 34
+low_6m_80 <-35
+mod_9m_80 <- 25
+high_6m_80 <- 42
 
-line_dat = data.frame(cases=c("Low transmission","Intermediate transmission","High transmission"),
-                      xv=c(-1,mod_80, high_80),
-                      xendv=c(-1,mod_80,high_80),
-                      yv=c(-1,0, 0),
-                      yendv=c(-1,80, 80),
-                      xh=c(-1,0,0),
-                      xendh=c(-1,mod_80, high_80),
-                      yh=c(-1,80, 80),
-                      yendh=c(-1,80,80))
+line_dat1 <- data.frame(
+  cases = c("Low transmission", "Low transmission","Low transmission",
+            "Intermediate transmission", "Intermediate transmission", "Intermediate transmission",
+            "High transmission", "High transmission", "High transmission"),
+  x = c(low_3m_80, low_6m_80, 0,
+        mod_6m_80, mod_9m_80, 0,
+        high_3m_80, high_6m_80, 0),
+  xend = c(low_3m_80, low_6m_80, low_6m_80,
+           mod_6m_80, mod_9m_80, mod_9m_80,
+           high_3m_80, high_6m_80,high_6m_80),
+  y = c(0, 0, 80,
+        0, 0, 80,
+        0, 0, 80),
+  yend = c(80, 80, 80,
+           80, 80, 80,
+           80, 80, 80)
+) %>% mutate(
+  cases = factor(cases, levels = c("Low transmission", "Intermediate transmission", "High transmission"))
+)
 
-line_dat$cases <- factor(line_dat$cases, levels = c("Low transmission", "Intermediate transmission", "High transmission"))
-
-
-ggplot(data=pred_df)+
-  geom_line(aes(x = antibody,y = prob*100))+
-  geom_ribbon(aes(x = antibody, ymin = lwr*100, ymax = upr*100),alpha=0.5,fill="#003399FF") +
+figA <- ggplot(data=pred_df_plt %>% filter(tstop %in% c("90","180","270","360")))+
+  geom_smooth(aes(x = A0,y = prob_cum*100, linetype=tstop_fac),color="blue",linewidth = 0.5)+
+  #geom_ribbon(aes(x = antibody, ymin = lwr*100, ymax = upr*100),alpha=0.5,fill="#003399FF") +
   labs(colour="Group") +
-  geom_segment(data=line_dat, aes(x = xh, xend = xendh, y = yh, yend = yendh), linetype="dashed", color = "darkblue", linewidth=0.3)+
-  geom_segment(data=line_dat, aes(x = xv, xend = xendv, y = yv, yend = yendv), linetype="dashed", color = "darkblue", linewidth=0.3)+
+  geom_segment(data = line_dat1, aes(x = x, xend = xend, y = y, yend = yend), color = "darkblue", linetype = "dashed",linewidth=0.3)+
   facet_grid2(~cases,axes = "all")+
   ylim(0,100)+
-  xlim(0,49)+
-  scale_y_continuous(breaks=seq(0,100,by=10),labels = expression(0,10,20,30,40,50,60,70,80,90,100),limits=c(0.0,100)) +
-  xlab("Omicron IgA binding (%)")+
+  xlim(0,51)+
+  scale_y_continuous(breaks=seq(0,100,by=20),labels = expression(0,20,40,60,80,100),limits=c(0.0,100)) +
+  scale_linetype_manual(values = c("solid","dotted","dotdash","longdash"))+
+  xlab("BA.1 IgA binding (%)")+
   ylab("Protection against infection (%)")+
-  theme_classic()
+  labs(linetype = "Days after booster vaccination") +  # Change legend title
+  theme_classic() +
+  theme(legend.position = "bottom")  
 
-ggsave("plot/protect_ba1_3months.png", width = 8, height = 3)
 
+#ba1_IgA_3 months
+low_20_80 <- 215
+mod_20_80 <- 155
+high_20_80 <- 95
+
+#ba1_IgA_6 months
+low_40_80 <- 290
+mod_40_80 <- 225
+high_40_80 <- 170
+
+line_dat2 <- data.frame(
+  cases = c("Low transmission", "Low transmission","Low transmission",
+            "Intermediate transmission", "Intermediate transmission", "Intermediate transmission",
+            "High transmission", "High transmission", "High transmission"),
+  x = c(low_20_80, low_40_80, 0,
+        mod_20_80, mod_40_80, 0,
+        high_20_80, high_40_80, 0),
+  xend = c(low_20_80, low_40_80, low_40_80,
+           mod_20_80, mod_40_80, mod_40_80,
+           high_20_80, high_40_80,high_40_80),
+  y = c(0, 0, 80,
+        0, 0, 80,
+        0, 0, 80),
+  yend = c(80, 80, 80,
+           80, 80, 80,
+           80, 80, 80)
+) %>% mutate(
+  cases = factor(cases, levels = c("Low transmission", "Intermediate transmission", "High transmission"))
+)
+
+
+figB <- ggplot(data=pred_df_plt %>% filter(A0 != "1"))+
+  #geom_line(aes(x = tstop,y = prob_cum*100, linetype=A0_fac),color="darkblue")+
+  geom_smooth(aes(x = tstop,y = prob_cum*100, linetype=A0_fac),color="blue",linewidth = 0.5)+
+  #geom_ribbon(aes(x = antibody, ymin = lwr*100, ymax = upr*100),alpha=0.5,fill="#003399FF") +
+  #labs(colour="Group") +
+  geom_segment(data = line_dat2, aes(x = x, xend = xend, y = y, yend = yend), color = "darkblue", linetype = "dashed",linewidth=0.3)+
+  facet_grid2(~cases,axes = "all")+
+  ylim(0,100)+
+  xlim(0,360)+
+  scale_y_continuous(breaks=seq(0,100,by=20),labels = expression(0,20,40,60,80,100),limits=c(0,100)) +
+  scale_linetype_manual(values = c("solid","dotted","dashed","dotdash","longdash"))+
+  xlab("Days after booster vaccination")+
+  ylab("Protection against infection (%)")+
+  labs(linetype = "BA.1 IgA binding (%)") +  # Change legend title
+  theme_classic() +
+  theme(legend.position = "bottom")  
+
+
+
+
+ggdraw() +
+  draw_plot(figA, x = 0.05, y = 0.5, width = 0.9, height = 0.48) +
+  draw_plot(figB, x = 0.05, y = 0.0, width = 0.9, height = 0.48) +
+  draw_plot_label(label = c("A", 
+                            "B"), size = 12,
+                  x = c(0.01,0.01), y = c(0.995, 0.495))
+
+ggsave(paste0(ABpath,"Figures/Figure6_revision1.png"), width = 9, height = 6,bg = "white")
+ggsave(paste0(ABpath,"Figures/Figure6_revision1.pdf"), width = 9, height = 6,bg = "white")
 
 
 
@@ -448,4 +453,4 @@ combine_table2 <- map_df(table2_df, ~as.data.frame(.x)) %>%
               values_from = mean_IQR)%>%
   relocate(high, .after = last_col())
 
-write_xlsx(combine_table2, "./output/table2.xlsx")
+write_xlsx(combine_table2, paste0(ABpath,"Output/table2.xlsx"))

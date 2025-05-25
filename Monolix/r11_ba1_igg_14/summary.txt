@@ -1,0 +1,141 @@
+********************************************************************************
+*                          r11_ba1_igg_14.mlxtran                              *
+*                          March 18, 2024 at 13:59:29                          *
+*                          Monolix version : 2023R1                            *
+********************************************************************************
+
+
+ESTIMATION OF THE POPULATION PARAMETERS ________________________________________
+
+Fixed Effects --------------------------------------     se_sa    rse(%)
+k1_pop                                   :     0.113   0.00469      4.16
+beta_k1_Infection_Late                   :   -0.0432    0.0311        72
+beta_k1_Infection_Uninfected             :    0.0319    0.0315      98.7
+k2_pop                                   :   0.00158  0.000295      18.7
+beta_k2__1st_Booster_vaccine_type_Pfizer :     0.692     0.219      31.7
+k3_pop                                   :    0.0147  1.88e-05     0.128
+beta_k3_Gender_Male                      :   -0.0219   0.00127      5.78
+beta_k3_Infection_Late                   :     0.698   0.00122     0.175
+beta_k3_Infection_Uninfected             :       1.6   0.00139    0.0871
+beta_k3__1st_Booster_vaccine_type_Pfizer :      0.48   0.00125      0.26
+beta_k3_age_cat___60                     :     0.297   0.00121     0.409
+k4_pop                                   :  1.54e-05  1.66e-05       108
+A0_pop                                   :      3.38     0.304         9
+
+Standard Deviation of the Random Effects -----------
+omega_k1                                 :     0.257    0.0297      11.5
+omega_k2                                 :     0.691     0.116      16.8
+omega_k3                                 :   0.00132   0.00039      29.5
+omega_k4                                 :      1.49       nan       nan
+omega_A0                                 :     0.652     0.067      10.3
+
+Correlations ---------------------------------------
+corr_k1_A0                               :    -0.958       nan       nan
+
+Error Model Parameters -----------------------------
+a                                        :     0.291       0.3       103
+b                                        :     0.314     0.032      10.2
+
+Elapsed time (seconds):      7.7
+Exploratory phase iterations:      150 (Autostop)
+Smoothing phase iterations:        102 (Autostop)
+
+ _______________________________________________________________________________
+
+
+
+ESTIMATION OF THE INDIVIDUAL PARAMETERS ________________________________________
+
+
+Estimation of the individual parameters by Conditional Distribution ------------
+           min        Q1    median        Q3       max
+k1 :    0.0545     0.103     0.119     0.134     0.155
+k2 :  0.000773   0.00164   0.00218   0.00369    0.0158
+k3 :    0.0144    0.0238    0.0468    0.0729     0.158
+k4 :   2.1e-05  3.58e-05  4.09e-05  5.18e-05  0.000122
+A0 :      1.68      2.43      3.28       4.6      21.2
+
+Elapsed time (seconds):      6.5
+Iterations:       80 (Autostop)
+
+ -------------------------------------------------------------------------------
+
+
+Estimation of the individual parameters by Conditional Mode --------------------
+           min        Q1    median        Q3       max
+k1 :    0.0534     0.101     0.117     0.133     0.154
+k2 :  0.000764   0.00154   0.00224    0.0041    0.0128
+k3 :    0.0144    0.0238    0.0468    0.0729     0.158
+k4 :  1.11e-05  1.49e-05  1.54e-05  1.55e-05   1.9e-05
+A0 :      1.56      2.23      3.13      4.43        21
+
+Elapsed time (seconds):      1.7
+
+ -------------------------------------------------------------------------------
+
+ _______________________________________________________________________________
+
+
+
+ESTIMATION OF THE FISHER INFORMATION MATRIX ____________________________________
+
+
+Estimation of the Fisher information matrix by Stochastic Approximation --------
+
+Correlation Matrix :
+                                  k1_pop         1
+                  beta_k1_Infection_Late  -0.25566         1
+            beta_k1_Infection_Uninfected  -0.35034   0.42579         1
+                                  k2_pop  0.066728 0.0054832  0.070128         1
+beta_k2__1st_Booster_vaccine_type_Pfizer  0.010983  0.049399 -0.028122  -0.74631         1
+                                  k3_pop   0.21609  0.030079 -0.025926  0.012994  0.036865         1
+                     beta_k3_Gender_Male   -0.2346  -0.15419 -0.027118 -0.052276 -0.080151  -0.40056         1
+                  beta_k3_Infection_Late 0.0088728  0.053807  0.045589  0.089621 -0.013794  -0.32052  -0.13661         1
+            beta_k3_Infection_Uninfected  0.043123 -0.039606  -0.10244  -0.15113  0.065967  -0.15968   0.11435   0.36073         1
+beta_k3__1st_Booster_vaccine_type_Pfizer -0.094439  0.067869 -0.073454  -0.12188  0.072575  -0.24815  0.050844  -0.33057  -0.20429         1
+                    beta_k3_age_cat___60 -0.056513  0.062807  0.054992   0.07252 -0.029189  -0.55979  -0.22478   0.09487  -0.29328  0.099472         1
+                                  k4_pop  -0.12832  0.0387090.00013251  -0.19345   0.10549  -0.12622   0.16881  -0.25822  0.015463   0.36416  0.010548         1
+                                  A0_pop  -0.84324  -0.05314  0.046502  0.022412 -0.013197  -0.16688   0.15035  0.035681 -0.065214  0.039819  0.075328  0.027064         1
+                                omega_k1 -0.098594  -0.14944   0.00107   0.05783 -0.096409  -0.18638   0.27381 -0.063529 -0.043691  0.060037 0.0075402    0.1105-0.0082789         1
+                              corr_k1_A0       nan       nan       nan       nan       nan       nan       nan       nan       nan       nan       nan       nan       nan       nan       nan
+                                omega_k2  0.011302 -0.027353  -0.10151  -0.39442   0.18846   0.10558 -0.035337 -0.059638   0.21535   0.11279  -0.13117   0.19202-0.0088452  -0.16855       nan         1
+                                omega_k3  0.071598   0.03603  0.019234  -0.04203   0.05426   0.22229  -0.36019  0.048732  0.057993  -0.14542   0.10467   0.20027 -0.065985  -0.10666       nan   0.11816         1
+                                omega_k4       nan       nan       nan       nan       nan       nan       nan       nan       nan       nan       nan       nan       nan       nan       nan       nan       nan       nan
+                                omega_A0   0.11823 -0.016394 -0.017277  0.061213 -0.061734   0.04717 0.0029032 -0.074305 -0.070646  0.045029 -0.041173   0.08519  -0.19312   0.75919       nan  -0.11862 -0.012681       nan         1
+                                       a -0.009964  -0.04272 -0.042938  -0.23952   0.22115 0.0072201 -0.040563 -0.045032   0.12587   0.13075-0.0048746   0.26815  0.096787   -0.2092       nan    0.5563   0.10501       nan  -0.22491         1
+                                       b -0.072347  0.018522  0.054097   0.18321  -0.19291 -0.068355   0.12858 0.0033191  -0.13864 -0.092447  0.016806  -0.16621 -0.041854   0.16951       nan  -0.52271  -0.10918       nan   0.14269  -0.82716         1
+
+WARNING : Impossible to compute the eigen values of the correlation matrix.
+
+Elapsed time (seconds):       16
+Iterations:      200 (Stopped at the maximum number of iterations/Fisher matrix was not correctly estimated)
+
+ -------------------------------------------------------------------------------
+
+ _______________________________________________________________________________
+
+
+
+ESTIMATION OF THE LOG-LIKELIHOOD _______________________________________________
+
+                                                            (is)
+-2 x log-likelihood                       (OFV) :        2495.70
+Akaike Information Criteria               (AIC) :        2537.70
+Corrected Bayesian Information Criteria  (BICc) :        2598.94
+Bayesian Information Criteria             (BIC) :        2589.24
+
+Elapsed time                          (seconds) :          26.27
+CPU time                              (seconds) :          26.00
+MonteCarlo size (is):    10000 (Fixed number of iterations)
+
+
+[Importance Sampling] Standard error        : 0.259
+                      Sampling distribution : T-distribution with 5 degrees of freedom
+
+ _______________________________________________________________________________
+
+DATASET INFORMATION
+Number of individuals: 86
+Number of observations (BA1_IgG): 344
+Number of doses: 0
+

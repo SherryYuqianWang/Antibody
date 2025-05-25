@@ -1,0 +1,4 @@
+residuals,statistics,p-value,test
+IWRES_BA1_IgA,-0.76744,0.44282,Symmetry
+PWRES_BA1_IgA,7.92283,2.22045e-15,Symmetry
+NPDE_BA1_IgA,0.914093,0.360668,Symmetry

@@ -1,0 +1,96 @@
+<DATAFILE>
+
+[FILEINFO]
+file='../../../2data/P360_Sflow_For Keisuke_17Jan2024_remove74.csv'
+delimiter = comma
+header={Code, Gender, Age, Ethnicity, Primary_vaccination_1st_and_2nd_dose_, _1st_dose_vaccination_dose, _1st_Booster_vaccine_type, Booster_Vaccination_date, Covid_date, Day, WT_IgG, BA1_IgG, WT_IgA, BA1_IgA, DoI, Infection, inf, booster_duration, age_cat}
+
+[CONTENT]
+Code = {use=identifier}
+Gender = {use=covariate, type=categorical}
+_1st_Booster_vaccine_type = {use=covariate, type=categorical}
+Day = {use=time}
+BA1_IgG = {use=observation, type=continuous}
+DoI = {use=regressor}
+Infection = {use=covariate, type=categorical}
+inf = {use=regressor}
+age_cat = {use=covariate, type=categorical}
+
+[SETTINGS]
+dataType = {'BA1_IgG'=plasma}
+
+<MODEL>
+
+[COVARIATE]
+input = {Gender, Infection, _1st_Booster_vaccine_type, age_cat}
+
+Gender = {type=categorical, categories={'Female', 'Male'}}
+Infection = {type=categorical, categories={'Early', 'Late', 'Uninfected'}}
+_1st_Booster_vaccine_type = {type=categorical, categories={'Moderna', 'Pfizer'}}
+age_cat = {type=categorical, categories={'<60', '>=60'}}
+
+[INDIVIDUAL]
+input = {A0_pop, omega_A0, k1_pop, omega_k1, k2_pop, omega_k2, k3_pop, omega_k3, k4_pop, omega_k4, Infection, beta_k1_Infection_Late, beta_k1_Infection_Uninfected, beta_k3_Infection_Late, beta_k3_Infection_Uninfected, _1st_Booster_vaccine_type, beta_k2__1st_Booster_vaccine_type_Pfizer, beta_k3__1st_Booster_vaccine_type_Pfizer, Gender, beta_k3_Gender_Male, corr_k1_A0, age_cat, beta_k3_age_cat___60}
+
+Infection = {type=categorical, categories={'Early', 'Late', 'Uninfected'}}
+_1st_Booster_vaccine_type = {type=categorical, categories={'Moderna', 'Pfizer'}}
+Gender = {type=categorical, categories={'Female', 'Male'}}
+age_cat = {type=categorical, categories={'<60', '>=60'}}
+
+DEFINITION:
+A0 = {distribution=logNormal, typical=A0_pop, sd=omega_A0}
+k1 = {distribution=logNormal, typical=k1_pop, covariate=Infection, coefficient={0, beta_k1_Infection_Late, beta_k1_Infection_Uninfected}, sd=omega_k1}
+k2 = {distribution=logNormal, typical=k2_pop, covariate=_1st_Booster_vaccine_type, coefficient={0, beta_k2__1st_Booster_vaccine_type_Pfizer}, sd=omega_k2}
+k3 = {distribution=logNormal, typical=k3_pop, covariate={Infection, _1st_Booster_vaccine_type, Gender, age_cat}, coefficient={{0, beta_k3_Infection_Late, beta_k3_Infection_Uninfected}, {0, beta_k3__1st_Booster_vaccine_type_Pfizer}, {0, beta_k3_Gender_Male}, {0, beta_k3_age_cat___60}}, sd=omega_k3}
+k4 = {distribution=logNormal, typical=k4_pop, sd=omega_k4}
+correlation = {level=id, r(k1, A0)=corr_k1_A0}
+
+[LONGITUDINAL]
+input = {a, b}
+
+file = '../../../1model/k1k2k3k4_21.txt'
+
+DEFINITION:
+BA1_IgG = {distribution=normal, prediction=A, errorModel=combined1(a, b)}
+
+<FIT>
+data = 'BA1_IgG'
+model = BA1_IgG
+
+<PARAMETER>
+A0_pop = {value=3.4143981, method=MLE}
+a = {value=0.465245, method=MLE}
+b = {value=0.3012486, method=MLE}
+beta_k1_Infection_Late = {value=-0.05658985, method=MLE}
+beta_k1_Infection_Uninfected = {value=0.02501643, method=MLE}
+beta_k2__1st_Booster_vaccine_type_Pfizer = {value=0.7463733, method=MLE}
+beta_k3_Gender_Male = {value=-0.02735208, method=MLE}
+beta_k3_Infection_Late = {value=0.7119857000000001, method=MLE}
+beta_k3_Infection_Uninfected = {value=1.6028697, method=MLE}
+beta_k3__1st_Booster_vaccine_type_Pfizer = {value=0.4831993, method=MLE}
+beta_k3_age_cat___60 = {value=0.2861025, method=MLE}
+c = {value=1, method=FIXED}
+corr_k1_A0 = {value=-0.9574598, method=MLE}
+k1_pop = {value=0.1130803, method=MLE}
+k2_pop = {value=0.001543662, method=MLE}
+k3_pop = {value=0.01472554, method=MLE}
+k4_pop = {value=0.00001952483, method=MLE}
+omega_A0 = {value=0.639612, method=MLE}
+omega_k1 = {value=0.2596937, method=MLE}
+omega_k2 = {value=0.7308309, method=MLE}
+omega_k3 = {value=0.005841173, method=MLE}
+omega_k4 = {value=0.9053217, method=MLE}
+
+<MONOLIX>
+
+[TASKS]
+populationParameters()
+individualParameters(method = {conditionalMean, conditionalMode })
+fim(method = StochasticApproximation)
+logLikelihood(method = ImportanceSampling)
+plotResult(method = {indfits, parameterdistribution, covariancemodeldiagnosis, covariatemodeldiagnosis, obspred, vpc, residualsscatter, residualsdistribution, randomeffects, saemresults })
+
+[SETTINGS]
+GLOBAL:
+exportpath = '../'
+

@@ -1,112 +1,81 @@
 # Population fit ##############################################################
 #generate samples from population parameter 
-sample_ab <- function(pop, num, booster, infect_late,infect_un, age, gender){
+sample_ab <- function(pop, num, booster, infect_late, infect_un, age, gender) {
+  param_names <- c("k1", "k2", "k3", "k4", "A0")
+  covariates <- c("Infection_Late", "Infection_Uninfected", "Gender_Male", 
+                  "age_cat___60", "_1st_Booster_vaccine_type_Pfizer")
+  covariate_values <- list(
+    Infection_Late = infect_late,
+    Infection_Uninfected = infect_un,
+    Gender_Male = gender,
+    age_cat___60 = age,
+    `_1st_Booster_vaccine_type_Pfizer` = booster
+  )
   
-  inds_mean <- which(rownames(pop) %in% c("k1_pop","k2_pop","k3_pop","k4_pop","A0_pop"))
-  inds_sd <- which(rownames(pop) %in% c("omega_k1","omega_k2","omega_k3","omega_k4","omega_A0"))
-
-  pars <- matrix(0, num+1, length(inds_mean)+1)
+  pars <- matrix(0, num + 1, length(param_names))
+  colnames(pars) <- param_names
+  log_means <- numeric(length(param_names))
+  sds <- numeric(length(param_names))
   
-  for (i in 1:length(inds_mean)) {
-    mean_par <- pop$value[inds_mean[i]]
-    sd_par <- pop$value[inds_sd[i]]
-    #sd_par <- pop$se_sa[inds_mean[i]] ####standard error of population parameter
+  for (i in seq_along(param_names)) {
+    par_name <- param_names[i]
+    mean_row <- paste0(par_name, "_pop")
+    sd_row <- paste0("omega_", par_name)
     
-    if (i==1 & (inds_mean[i+1]-inds_mean[i]==3)) {
-      mean_infect_late <- pop$value[inds_mean[i]+1]
-      mean_infect_un <- pop$value[inds_mean[i]+2]
-      meanlog = log(mean_par)+infect_late*mean_infect_late+infect_un*mean_infect_un
-      mean_log_k1 <- meanlog
-      pars[1:num, i] <- exp(rnorm(num, mean = meanlog, sd=sd_par))
-      pars[num+1, i] <- exp(meanlog)
-    } 
+    mean_par <- pop$value[rownames(pop) == mean_row]
+    sd_par <- pop$value[rownames(pop) == sd_row]
     
-    else if (i==1 & (inds_mean[i+1]-inds_mean[i]==2)) {
-      mean_booster_pf <- pop$value[inds_mean[i]+1]
-      meanlog = log(mean_par)+booster*mean_booster_pf
-      mean_log_k1 <- meanlog
-      pars[1:num, i] <- exp(rnorm(num, mean = meanlog, sd=sd_par))
-      pars[num+1, i] <- exp(meanlog)
-    } 
+    log_mean <- log(mean_par)
     
-    else if (i==2) {
-      mean_booster_pf <- pop$value[inds_mean[i]+1]
-      meanlog = log(mean_par)+booster*mean_booster_pf
-      pars[1:num, i] <- exp(rnorm(num, mean=meanlog, sd=sd_par))
-      pars[num+1, i] <- exp(meanlog)
+    for (covariate in covariates) {
+      beta_name <- paste0("beta_", par_name, "_", covariate)
+      
+      if (beta_name %in% rownames(pop)) {
+        beta_val <- pop$value[rownames(pop) == beta_name]
+        log_mean <- log_mean + covariate_values[[covariate]] * beta_val
+      }
     }
     
-    else if (i==3 & (inds_mean[i+1]-inds_mean[i]==4)) {
-      mean_infect_late <- pop$value[inds_mean[i]+1]
-      mean_booster_pf <- pop$value[inds_mean[i]+3]
-      meanlog = log(mean_par)+infect_late*mean_infect_late+booster*mean_booster_pf
-      pars[1:num, i] <- exp(rnorm(num, mean=meanlog, sd=sd_par))
-      pars[num+1, i] <- exp(meanlog)
-    }
-    
-    else if (i==3 & (inds_mean[i+1]-inds_mean[i]==5)) {
-      mean_gender_male <- pop$value[inds_mean[i]+1]
-      mean_infect_late <- pop$value[inds_mean[i]+2]
-      mean_age <- pop$value[inds_mean[i]+4]
-      meanlog = log(mean_par)+gender*mean_gender_male+infect_late*mean_infect_late+age*mean_age
-      pars[1:num, i] <- exp(rnorm(num, mean=meanlog, sd=sd_par))
-      pars[num+1, i] <- exp(meanlog)
-    }
-    
-    else if (i==3 & (inds_mean[i+1]-inds_mean[i]==6)) {
-      mean_gender_male <- pop$value[inds_mean[i]+1]
-      mean_infect_late <- pop$value[inds_mean[i]+2]
-      mean_booster_pf <- pop$value[inds_mean[i]+4]
-      mean_age <- pop$value[inds_mean[i]+5]
-      meanlog = log(mean_par)+gender*mean_gender_male+infect_late*mean_infect_late+booster*mean_booster_pf+age*mean_age
-      pars[1:num, i] <- exp(rnorm(num, mean=meanlog, sd=sd_par))
-      pars[num+1, i] <- exp(meanlog)
-    }
-    
-    else if (i==4 & (rownames(pop)[inds_mean[i]+1] == "beta_k4__1st_Booster_vaccine_type_Pfizer")) {
-      mean_booster_pf <- pop$value[inds_mean[i]+1]
-      meanlog = log(mean_par)+booster*mean_booster_pf
-      pars[1:num, i] <- exp(rnorm(num, mean=meanlog, sd=sd_par))
-      pars[num+1, i] <- exp(meanlog)
-    }
-    
-    else if (i==4 & (rownames(pop)[inds_mean[i]+1] == "beta_k4_Gender_Male")) {
-      mean_gender_male <- pop$value[inds_mean[i]+1]
-      meanlog = log(mean_par)+gender*mean_gender_male
-      pars[1:num, i] <- exp(rnorm(num, mean=meanlog, sd=sd_par))
-      pars[num+1, i] <- exp(meanlog)
-    }
-    
-    else if (i==4 & (inds_mean[i+1]-inds_mean[i]==3)) {
-      mean_infect_late <- pop$value[inds_mean[i]+1]
-      meanlog = log(mean_par)+infect_late*mean_infect_late
-      pars[1:num, i] <- exp(rnorm(num, mean=meanlog, sd=sd_par))
-      pars[num+1, i] <- exp(meanlog)
-    }
-    
-    else if (i==5 & (rownames(pop)[inds_mean[i]+1] == "beta_A0__1st_Booster_vaccine_type_Pfizer")) {
-      mean_booster_pf <- pop$value[inds_mean[i]+1]
-      meanlog = log(mean_par)+booster*mean_booster_pf
-      mean_log_a0 <- meanlog
-      pars[1:num, i] <- exp(rnorm(num, mean=meanlog, sd=sd_par))
-      pars[num+1, i] <- exp(meanlog)
-    }
-    
-    else { 
-      mean_log_a0 <- log(mean_par)
-      pars[1:num, i] <- exp(rnorm(num, mean=log(mean_par), sd=sd_par))
-      pars[num+1, i] <- mean_par
-    }
+    log_means[i] <- log_mean
+    sds[i] <- sd_par
   }
   
-  sd_k1 <- pop$value[inds_sd[1]]
-  sd_a0 <- pop$value[inds_sd[5]]
-  corr <- pop$value[which(row.names(pop)=="corr_k1_A0")]
-  cov_k1_a0 <- corr*sd_k1*sd_a0
-  sigma <- rbind(c(sd_k1^2, cov_k1_a0), c(cov_k1_a0, sd_a0^2))
-  mu <- c(mean_log_k1, mean_log_a0)
-  res <- mvrnorm(n=num, mu=mu, Sigma=sigma)
-  pars[1:num, c(1, 5)] <- exp(res)
+  # Handle correlated sampling between k1 and A0
+  k1_index <- which(param_names == "k1")
+  A0_index <- which(param_names == "A0")
+  
+  if ("corr_k1_A0" %in% rownames(pop)) {
+    corr <- pop$value[rownames(pop)=="corr_k1_A0"]
+    cov_k1_a0 <- corr * sds[k1_index] * sds[A0_index]
+    sigma <- matrix(c(
+      sds[k1_index]^2, cov_k1_a0,
+      cov_k1_a0, sds[A0_index]^2
+    ), nrow = 2, byrow = TRUE)
+    
+    mu <- c(log_means[k1_index], log_means[A0_index])
+    res <- MASS::mvrnorm(n = num, mu = mu, Sigma = sigma)
+    
+    pars[1:num, k1_index] <- exp(res[, 1])
+    pars[1:num, A0_index] <- exp(res[, 2])
+    
+    # Use mean log for deterministic value
+    pars[num + 1, k1_index] <- exp(mu[1])
+    pars[num + 1, A0_index] <- exp(mu[2])
+  } else {
+    # Fall back to univariate sampling
+    pars[1:num, k1_index] <- exp(rnorm(num, mean = log_means[k1_index], sd = sds[k1_index]))
+    pars[1:num, A0_index] <- exp(rnorm(num, mean = log_means[A0_index], sd = sds[A0_index]))
+    pars[num + 1, k1_index] <- exp(log_means[k1_index])
+    pars[num + 1, A0_index] <- exp(log_means[A0_index])
+  }
+  
+  # Sample remaining parameters
+  for (i in seq_along(param_names)) {
+    if (i %in% c(k1_index, A0_index)) next
+    pars[1:num, i] <- exp(rnorm(num, mean = log_means[i], sd = sds[i]))
+    pars[num + 1, i] <- exp(log_means[i])
+  }
+  
   return(pars)
 }
 
@@ -151,7 +120,7 @@ ode_ab_pop<-function(pars,infect){
   as.data.frame(out)
 }
 
-###simulation to plot the confidence interval
+#simulation to plot the confidence interval
 simulate_AB<-function(group_list){
   
   booster <- group_list$booster
@@ -201,6 +170,62 @@ simulate_AB<-function(group_list){
   return(Fit)
 }
 
+#create dataframe for plotting
+create_group_df <- function(booster_vals, gender_vals, age_vals) {
+  infection_types <- tibble(
+    infect = 0:2,
+    infect_late = c(0, 1, 0),
+    infect_un = c(0, 0, 1),
+    infect_label = c("early infected", "late infected", "non infected")
+  )
+  
+  expand_grid(
+    booster = booster_vals,
+    gender = gender_vals,
+    age = age_vals,
+    infection_types
+  ) %>%
+    mutate(
+      group = paste(
+        if_else(booster == 1, "Pf booster", "Mo booster"),
+        infect_label,
+        if_else(age == 1, "age>=60", "age<60"),
+        if_else(gender == 1, "male", "female"),
+        sep = ", "
+      )
+    ) %>%
+    select(group, booster, infect_late, infect_un, infect, gender, age)
+}
+
+#Plotting function
+make_plot <- function(data, group_var, y_label, color_values, fill_values) {
+  p <- ggplot(data) +
+    geom_line(aes(x = time, y = best_ab, color = .data[[group_var]]), size = 1) +
+    geom_ribbon(aes(x = time, ymin = q1_ab, ymax = q3_ab, fill = .data[[group_var]]), alpha = 0.2) +
+    geom_ribbon(aes(x = time, ymin = low_ab, ymax = high_ab, fill = .data[[group_var]]), alpha = 0.08) +
+    xlab("Days after booster vaccination") +
+    ylab(y_label) +
+    scale_y_continuous(breaks = seq(10, 70, by = 10), limits = c(0, 70),
+                       labels = as.character(seq(10, 70, by = 10))) +
+    scale_color_manual(values = color_values) +
+    scale_fill_manual(values = fill_values) +
+    facet_grid(. ~ Infect) +
+    theme_classic() +
+    theme(strip.background = element_blank())
+  
+  # Remove legend if y_label matches these values
+  if (y_label %in% c("WT IgG (%)", "BA.1 IgG (%)")) {
+    p <- p + theme(legend.position = "none")
+  }
+  
+  if (!is.null(j) && !is.null(ab)) {
+    if (j == 1 || ab %in% c("WT IgG (%)", "WT IgA (%)")) {
+      p <- p + theme(axis.title.x = element_blank())
+    }
+  }
+  
+  return(p)
+}
 
 
 # Individual fit ###############################################################
@@ -578,9 +603,9 @@ regression_table<-function(ind_AB){
 # Survival analysis ############################################################
 ###
 ode_ab_surv<-function(pars,tstop_ind){
-  
-  A0 <- pars[1]
-  k2 <- pars[2]
+
+  A0 <- pars[[1]]
+  k2 <- pars[[2]]
   
   times<-c(seq(Tmin,tstop_ind,step_size))
   infection <- data.frame(times = times, inf_0 = rep(-k2, length(times)))
@@ -590,49 +615,6 @@ ode_ab_surv<-function(pars,tstop_ind){
                                                 #times > boost & times <= boost+21 ~ k3,
                                                 #times > boost+21 ~ -k4))
   
-  k_t <- approxfun(infection$times, infection[,2], rule = 2)
-  
-  derivs<-function(times,y,pars,k_t){
-    with(as.list(c(pars,y)),{
-      k <- k_t(times)   # <---- here
-      dA <- k*A
-      return(list(c(dA)))
-    })
-  }
-  y<-c(A=A0)
-  
-  
-  out<-ode(y=y,parms=pars,times=times,func=derivs, k_t=k_t)
-  as.data.frame(out)
-}
-
-
-###
-ode_ab_boost<-function(pars,boost_interval,tstop_ind){
-  
-  A0 <- pars[1] #antibody peak
-  k1 <- pars[2]
-  k2 <- pars[3]
-  k3 <- pars[4]
-  
-  times<-c(seq(Tmin,tstop_ind,step_size))
-  infection <- data.frame(times = times, inf_0 = c(rep(k1, 21),rep(-k2, length(times)-21)))
-  
-  #if (boost_interval==3){
-  #  infection <- infection %>% mutate(inf_0 = ifelse((times>69 & times <90) | (times>159 & times <180) | (times>249 & times <270), k3,-k2))
-  #} else 
-    if (boost_interval==0){
-    infection <- infection %>% mutate(inf_0 = 
-                                        case_when(times <= 21 ~ k1, 
-                                                  times > 21 & times <= 180 ~ -k2,
-                                                  times > 180 & times <= 201 ~ k3))
-  } else if (boost_interval==1){
-    infection <- infection %>% mutate(inf_0 = 
-                                        case_when(times <= 21 ~ k1, 
-                                                  times > 21 & times <= 270 ~ -k2,
-                                                  times > 270 & times <= 291 ~ k3))
-  } 
-
   k_t <- approxfun(infection$times, infection[,2], rule = 2)
   
   derivs<-function(times,y,pars,k_t){

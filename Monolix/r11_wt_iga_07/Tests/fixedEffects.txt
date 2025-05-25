@@ -1,0 +1,8 @@
+parameter,statistics(sa),p-value(sa)
+beta_k1__1st_Booster_vaccine_type_Pfizer,2.92155,0.00348
+beta_k2__1st_Booster_vaccine_type_Pfizer,2.55157,0.0107
+beta_k3_Infection_Late,348.431,<2.2e-16
+beta_k3_Infection_Uninfected,3002.8,<2.2e-16
+beta_k3__1st_Booster_vaccine_type_Pfizer,500.279,<2.2e-16
+beta_k4__1st_Booster_vaccine_type_Pfizer,0.416325,0.677
+beta_A0__1st_Booster_vaccine_type_Pfizer,3.26337,0.0011

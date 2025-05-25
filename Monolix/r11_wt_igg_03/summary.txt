@@ -1,0 +1,137 @@
+********************************************************************************
+*                          r11_wt_igg_03.mlxtran                               *
+*                          March 17, 2024 at 13:41:41                          *
+*                          Monolix version : 2023R1                            *
+********************************************************************************
+
+
+ESTIMATION OF THE POPULATION PARAMETERS ________________________________________
+
+Fixed Effects --------------------------------------     se_sa    rse(%)
+k1_pop                                   :    0.0423   0.00224      5.31
+beta_k1_Infection_Late                   :     0.011    0.0337       305
+beta_k1_Infection_Uninfected             :    0.0769    0.0363      47.3
+k2_pop                                   :  0.000382  0.000126        33
+beta_k2__1st_Booster_vaccine_type_Pfizer :      1.19     0.297      25.1
+k3_pop                                   :   0.00798  0.000383       4.8
+beta_k3_Infection_Late                   :     0.521    0.0577      11.1
+beta_k3_Infection_Uninfected             :     0.825     0.139      16.9
+beta_k3__1st_Booster_vaccine_type_Pfizer :     0.508     0.103      20.2
+k4_pop                                   :  3.45e-06  2.32e-06      67.1
+beta_k4__1st_Booster_vaccine_type_Pfizer :       3.7     0.637      17.2
+A0_pop                                   :      19.3     0.816      4.23
+
+Standard Deviation of the Random Effects -----------
+omega_k1                                 :     0.257    0.0345      13.4
+omega_k2                                 :     0.486    0.0863      17.8
+omega_k3                                 :    0.0646    0.0299      46.4
+omega_k4                                 :     0.706     0.632      89.6
+omega_A0                                 :     0.243     0.029      11.9
+
+Correlations ---------------------------------------
+corr_k1_A0                               :    -0.947       nan       nan
+
+Error Model Parameters -----------------------------
+a                                        :      5.71     0.315      5.51
+
+Elapsed time (seconds):      8.4
+Exploratory phase iterations:      227 (Autostop)
+Smoothing phase iterations:        102 (Autostop)
+
+ _______________________________________________________________________________
+
+
+
+ESTIMATION OF THE INDIVIDUAL PARAMETERS ________________________________________
+
+
+Estimation of the individual parameters by Conditional Distribution ------------
+           min        Q1    median        Q3       max
+k1 :    0.0297    0.0385    0.0445    0.0503    0.0623
+k2 :  0.000293  0.000412  0.000665   0.00128   0.00406
+k3 :   0.00786    0.0132     0.018    0.0224    0.0306
+k4 :   3.4e-06  4.43e-06  7.31e-05  0.000176  0.000246
+A0 :      14.2      16.9      19.9        22      28.8
+
+Elapsed time (seconds):      1.5
+Iterations:       96 (Autostop)
+
+ -------------------------------------------------------------------------------
+
+
+Estimation of the individual parameters by Conditional Mode --------------------
+           min        Q1    median        Q3       max
+k1 :    0.0285    0.0375    0.0433    0.0484    0.0602
+k2 :  0.000263  0.000374  0.000602   0.00123   0.00364
+k3 :   0.00787    0.0132    0.0182    0.0223    0.0303
+k4 :  3.18e-06  3.46e-06  6.51e-05   0.00014  0.000203
+A0 :      14.5      16.9      19.8      22.2      29.2
+
+Elapsed time (seconds):     0.42
+
+ -------------------------------------------------------------------------------
+
+ _______________________________________________________________________________
+
+
+
+ESTIMATION OF THE FISHER INFORMATION MATRIX ____________________________________
+
+
+Estimation of the Fisher information matrix by Stochastic Approximation --------
+
+Correlation Matrix :
+                                  k1_pop         1
+                  beta_k1_Infection_Late  -0.45175         1
+            beta_k1_Infection_Uninfected  -0.43133   0.48539         1
+                                  k2_pop -0.077679  0.075651    0.2779         1
+beta_k2__1st_Booster_vaccine_type_Pfizer -0.025288  0.028664  -0.20996  -0.87667         1
+                                  k3_pop  0.012031   0.03941  0.070274  -0.20309  0.038935         1
+                  beta_k3_Infection_Late  0.088644  -0.13642 -0.086853   0.14989 -0.040434  -0.54955         1
+            beta_k3_Infection_Uninfected   0.35569  -0.21448  -0.18274  -0.31108  0.059417   0.30755  0.047552         1
+beta_k3__1st_Booster_vaccine_type_Pfizer  -0.31413   0.17484   0.24037   0.46408    -0.186  -0.57348   0.08859  -0.79192         1
+                                  k4_pop  0.029037  0.022777  -0.27238  -0.46777   0.41959  -0.04663  0.093695   0.12984  -0.31343         1
+beta_k4__1st_Booster_vaccine_type_Pfizer  0.074891 -0.059215   0.14424   0.26904  -0.31247   0.17469  -0.20846   0.08009  0.054404  -0.83788         1
+                                  A0_pop  -0.87401   0.14284   0.17107   0.17768 -0.050473  -0.11898  0.011201  -0.35682   0.34485 -0.043942 -0.063858         1
+                                omega_k1  -0.28208   0.19981  0.064119  0.027293  0.068609  -0.17038  0.089837  -0.21786    0.1644   0.14054  -0.19046    0.1378         1
+                              corr_k1_A0       nan       nan       nan       nan       nan       nan       nan       nan       nan       nan       nan       nan       nan       nan
+                                omega_k2  0.068386  -0.10614  0.032381  -0.21407    0.0405   0.17629 -0.093225   0.15922   -0.1903  -0.03681  0.037221 -0.094617  -0.14224       nan         1
+                                omega_k3   0.14116 -0.049378  -0.26198  -0.52077   0.40655  0.032592 -0.049217   0.16225  -0.46931   0.60392  -0.34589  -0.14989  0.060954       nan  0.075787         1
+                                omega_k4  -0.24204  0.099307   0.29992   0.59256  -0.34694  -0.31444   0.17227  -0.62458   0.77824  -0.53695   0.18955   0.30398  0.026469       nan  -0.12487  -0.68031         1
+                                omega_A0 -0.044582  0.099822  0.034936 0.0043942 0.0058373 -0.093468  0.092067  0.014864-0.0093678  0.047433 -0.081797 -0.090743   0.81437       nan -0.014791  0.032476 -0.066461         1
+                                       a  0.040226 -0.076463  0.016025   0.08293   -0.1151   0.17494  -0.12165  0.095897 -0.040313  -0.18177   0.16509  0.015402  -0.33056       nan -0.056867  -0.17799  0.087364  -0.31165         1
+
+WARNING : Impossible to compute the eigen values of the correlation matrix.
+
+Elapsed time (seconds):        5
+Iterations:      200 (Stopped at the maximum number of iterations/Fisher matrix was not correctly estimated)
+
+ -------------------------------------------------------------------------------
+
+ _______________________________________________________________________________
+
+
+
+ESTIMATION OF THE LOG-LIKELIHOOD _______________________________________________
+
+                                                            (is)
+-2 x log-likelihood                       (OFV) :        2342.89
+Akaike Information Criteria               (AIC) :        2380.89
+Corrected Bayesian Information Criteria  (BICc) :        2435.84
+Bayesian Information Criteria             (BIC) :        2427.52
+
+Elapsed time                          (seconds) :           7.52
+CPU time                              (seconds) :           7.00
+MonteCarlo size (is):    10000 (Fixed number of iterations)
+
+
+[Importance Sampling] Standard error        : 0.264
+                      Sampling distribution : T-distribution with 5 degrees of freedom
+
+ _______________________________________________________________________________
+
+DATASET INFORMATION
+Number of individuals: 86
+Number of observations (WT_IgG): 344
+Number of doses: 0
+
