@@ -29,3 +29,4 @@ This repository contains the code and data used for the manuscript titled "Model
 Current maintainer:
 - Yuqian Wang (yuqian.wang[at]uzh.ch)
 - Luis J Ponce (PONC0001[at]e.ntu.edu.sg)
+- Ananya Singh (ananya010[at]e.ntu.edu.sg)
